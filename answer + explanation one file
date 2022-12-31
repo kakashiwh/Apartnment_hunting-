@@ -1,0 +1,298 @@
+Understanding the problem statement and coming up with the logic 
+school -sc
+gym    -g
+store  -st
+
+0  1 2  3  4
+sc g g  sc sc
+     sc    st
+
+In the question it says at each block we may have or may not have
+the apartment that we need like in the first block we have school present and gym and store 
+is false so here we will only care about the apartments that is present
+in the blocks and we will make the graphical diagram in the above  
+
+
+requirement
+g  sc  st
+
+	  we have to find minimum distance or least amount of distance from each of the apartments that
+	  we can/should take in order to get our required apartments or to reach our
+	  end goal or destination 
+
+at index 0 	            
+g  sc  st		so here we will take the max distance 
+1   0   4		we have to walk 4 blocks in order to reach		
+				store so the max distance is 4
+
+Now we have to do the same process for all the blocks 
+
+at index 1
+g  sc  st 		so here the max distance is 3 so if we pick the apartment
+0   1   3		at index 1 we will have to walk 3 blocks to get to
+				all of our buildings cause one of the apartment is 3 
+				blocks away so max distance is 3
+
+at index 2
+g  sc  st       so here the max distance is 2 
+0  0    2
+
+at index 3   
+g  sc  st		so here the max	distance is 1
+1   0   1
+
+at index 4
+g  sc  st		so here the max distance is 2
+2	0	0
+
+so here the answer is index 3 which has the minimum distance that 
+we can take to reach all of our buildings which is 1 thats why the answer is 
+index 3 
+
+//(Brute Force) 
+we iterate through all the blocks and at the same time we will also
+iterate our required buildings to check which has the max distance to 
+get to a particular apartment and store it in the array or hash map with the indexes
+at the end we can just print out which is minimum distance the blocks has
+so here we basically have to take 2 for loops with one more for loop for the reiterator to get 
+or find the closed distance the time complexity increases if we take two for 
+loop in one go which is basically a power it will be like o(n^2r)n is the two loop and r is reiterator
+which is used to calculate the distance .The space complexity will be not that much as we are storing it in 
+array itself so its basically like o(n)
+
+
+
+//(Optimization :- sliding window ) 
+so after reading the questions a couple of times as the question has given so many informations
+but not all information is needed lets see how , first we can ignore all the apartment inside the block
+which is false so we will be left with apartment which is actually present in the block(which are true). its basically like 
+having an array for all the apartment which are only true and then we have our requirement
+array so this problem can be solved by using sliding window method 
+now what do we know about sliding window method (and the question have as contiguous blocks  so as a hint we can take it as array just for understanding purpose )
+first we will go through the format of it 
+so its like the problem will be talking about having an array and we have to get minimum or maximum subarray 
+or substring of the window size k(it can vary too remember that) its very similar to this question where we have given blocks which has apartments present 
+(we talked about earlier ) and we have given the requirement(apartments) and we should get minimum distance or length from the apartments
+here the window size is basically our size of requirement(block)
+
+blocks:[[school],[gym],[gym,school],[school],[school,store]]
+reqsblock:[school,gym,store]
+
+so the way to solve this problem is we will form a hashmap or map then store the 
+number of occurances of the array and check that with the length of the reqsblock which is 
+
+{
+school - 1
+gym    - 1
+store  - 1
+}
+
+NOTE : THE NUMBER OF OCCURANCES CAN BE MORE THAN THE REQSBLOCK SO ITS FINE IF ITS MORE LATER ON WE WILL REMOVE THE EXTRA OCCURANCES
+  
+now we will iterate through the array and store it in map and keep track of the length or size of the map and compare it with size of reqsblock
+after getting the required length then we will start removing the extra apartment as well as keeping track of the length of the reqsblock so that we can get minimum length from 
+
+
+//code
+function (blocks, reqs) {
+        var result = 0; 								         /* result which will be our final answer */
+        var minLength = Infinity;										/*to get minimum length */
+        var map__1 = new Map(); 									  	/*to store the values of blocks */
+        for (var low = 0, high = 0; high <  blocks.length; high++) {	/*low and high is the window size of when we increase the high the size of the window will increase and the length of the window will be high - low */
+            {
+                
+                addBlockTomap__1( blocks[high], reqs, map__1);			/* adding to the map */
+                
+                for (;  Object.keys(map__1).length ===  reqs.length ; low++) { /* checking when the map size and reqs size or length are equal */ 
+                    {
+                        
+                        var length = high - low;
+                        if (length < minLength) {
+                            minLength = length;
+                            result = high-low ;                           /* when we get minimum length we will store it in result*/
+                        
+                        }
+                        removeBlockFrommap__1( blocks[low], reqs, map__1);		/*remove the extra occurances in order to get minimum length */
+                        
+                    };
+                    
+                }
+            };
+            
+        }
+        return result;
+    };
+    addBlockTomap__1 = function (block, reqs, map__1) {  /* adding the occurances */
+        for (var i = 0; i < block.length; i++) {
+            var inside = block[i];
+            {
+                if ( (reqs.indexOf((inside)) >= 0)) {
+                     map__1[inside] = map__1.get(inside) + 1;
+                }
+            }
+        }
+    };
+    removeBlockFrommap__1 = function (block, reqs, map__1) {  /* remove the occurances */
+         for (var j = 0; j < block.length; j++) 
+          {  var  inside= block[j];
+          
+                if ( (reqs.indexOf((inside)) < 1)) {
+                    map__1[inside] =   map__1.get(inside) - 1;
+                   (function (map) { var deleted = map__1[inside]; delete map__1[inside]; return deleted; })(map__1);
+                }
+            }
+         
+    };
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////*************************////////////////////////////////////////////////////////////////////////////////////
+actual code
+ 
+
+var Main =(function () {
+    function Main() {
+    }
+    Main.pickBlock = function (reqs, blocks) {
+        var result = 0;
+        var minLen = Infinity;
+        var map__1 = new Map();
+        for (var lo = 0, hi = 0; hi <  blocks.length; hi++) {
+            {
+                console.log("------------------------------------Interation ::" + hi);
+                Main.addBlockToWindow( blocks[hi], reqs, map__1);
+                console.log("window:: " + map__1);
+                for (;  Object.keys(map__1).length ===  reqs.length ; lo++) {
+                    {
+                        
+                        var len = hi - lo;
+                        if (len < minLen) {
+                            minLen = len;
+                            result = hi-lo ;
+                            console.log("block!" + result);
+                        }
+                        Main.removeBlockFromWindow( blocks[lo], reqs, map__1);
+                        console.log("After Remove window:: " + map__1);
+                    };
+                    
+                }
+            };
+            
+        }
+        return result;
+    };
+     Main.addBlockToWindow = function (block, reqs, map__1) {
+        for (var i = 0; i < block.length; i++) {
+            var inside = block[i];
+            {
+                if ( (reqs.indexOf((inside)) >= 0)) {
+                     map__1[inside] = map__1.get(inside) + 1;
+                }
+            }
+        }
+    };
+    Main.removeBlockFromWindow = function (block, reqs, map__1) {
+         for (var j = 0; j < block.length; j++) 
+          {  var  inside= block[j];
+          
+                if ( (reqs.indexOf((inside)) < 1)) {
+                    map__1[inside] =   map__1.get(inside) - 1;
+                   (function (map) { var deleted = map__1[inside]; delete map__1[inside]; return deleted; })(map__1);
+                }
+            }
+         
+    };
+    Main.main = function (args) {
+        var amenities = ([]);
+         (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(amenities, "gym");
+        (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(amenities, "school");
+        (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(amenities, "store");
+        var blocks = ([]);
+        var block1 = ([]);
+        (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block1, "school");
+        (blocks.push(block1) > 0);
+        var block2 = ([]);
+         (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block2, "gym");
+       (blocks.push(block2) > 0);
+        var block3 = ([]);
+        (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block3, "gym");
+        (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block3, "school");
+         (blocks.push(block3) > 0);
+        var block4 = ([]);
+         (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block4, "school");
+         (blocks.push(block4) > 0);
+        var block5 = ([]);
+         (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block5, "school");
+         (function (s, e) { if (s.indexOf(e) == -1) {
+            s.push(e);
+            return true;
+        }
+        else {
+            return false;
+        } })(block5, "store");
+         (blocks.push(block5) > 0);
+        var result = Main.pickBlock(amenities, blocks);
+        console.info("result!" + result);
+    };
+    return Main;
+}());
+Main["__class"] = "Main";
+Main.main(null);
+///////////////////////////////////////////////////////////////////////////////*************************////////////////////////////////////////////////////////////////////////////////////
+
